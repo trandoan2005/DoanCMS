@@ -1,0 +1,48 @@
+@model CMS.Data.Entities.Post
+
+@{
+    ViewData["Title"] = "Xóa Bài viết";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Xác nhận Xóa Bài viết</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    Bạn có chắc chắn muốn xóa bài viết này? Hành động này <strong>không thể hoàn tác</strong>.
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3 fw-semibold">ID</dt>
+                    <dd class="col-sm-9">@Model.Id</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Tiêu đề</dt>
+                    <dd class="col-sm-9"><strong class="text-danger">@Model.Title</strong></dd>
+
+                    <dt class="col-sm-3 fw-semibold">Danh mục</dt>
+                    <dd class="col-sm-9"><span class="badge bg-secondary">@(Model.Category?.Name ?? "N/A")</span></dd>
+
+                    <dt class="col-sm-3 fw-semibold">Ngày tạo</dt>
+                    <dd class="col-sm-9">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Xác nhận Xóa
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

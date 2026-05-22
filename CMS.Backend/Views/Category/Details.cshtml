@@ -1,0 +1,55 @@
+@model CMS.Data.Entities.Category
+
+@{
+    ViewData["Title"] = "Chi tiết Danh mục";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-eye me-2"></i>Chi tiết Danh mục</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3 fw-semibold">ID</dt>
+                    <dd class="col-sm-9">@Model.Id</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Tên danh mục</dt>
+                    <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+                    <dt class="col-sm-3 fw-semibold">Mô tả</dt>
+                    <dd class="col-sm-9">@(Model.Description ?? "Không có mô tả")</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Số bài viết</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-primary fs-6">@(Model.Posts?.Count ?? 0) bài</span>
+                    </dd>
+                </dl>
+
+                @if (Model.Posts != null && Model.Posts.Any())
+                {
+                    <hr />
+                    <h6 class="fw-bold text-muted mb-3">Bài viết thuộc danh mục:</h6>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var post in Model.Posts)
+                        {
+                            <li class="list-group-item">
+                                <i class="bi bi-file-text me-2 text-primary"></i>@post.Title
+                                <small class="text-muted ms-2">(@post.CreatedDate.ToString("dd/MM/yyyy"))</small>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil me-1"></i> Sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

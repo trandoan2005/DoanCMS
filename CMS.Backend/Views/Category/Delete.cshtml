@@ -1,0 +1,45 @@
+@model CMS.Data.Entities.Category
+
+@{
+    ViewData["Title"] = "Xóa Danh mục";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Xác nhận Xóa Danh mục</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    Bạn có chắc chắn muốn xóa danh mục này? Hành động này <strong>không thể hoàn tác</strong>.
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3 fw-semibold">ID</dt>
+                    <dd class="col-sm-9">@Model.Id</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Tên danh mục</dt>
+                    <dd class="col-sm-9"><strong class="text-danger">@Model.Name</strong></dd>
+
+                    <dt class="col-sm-3 fw-semibold">Mô tả</dt>
+                    <dd class="col-sm-9">@(Model.Description ?? "Không có")</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Xác nhận Xóa
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
