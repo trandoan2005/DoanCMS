@@ -1,19 +1,20 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import PostDetail from './PostDetail';
 import './App.css';
 
-function App() {
+function Home() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Gọi API Category
     fetch('https://localhost:7226/api/categoryapi')
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error('Lỗi Category:', err));
 
-    // Gọi API Post
     fetch('https://localhost:7226/api/postapi')
       .then(res => res.json())
       .then(data => {
@@ -65,18 +66,29 @@ function App() {
           </thead>
           <tbody>
             {posts.map((item) => (
-              <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
+              <tr key={item.id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}
+                onClick={() => navigate(`/post/${item.id}`)}>
                 <td style={{ padding: '12px', textAlign: 'center' }}>{item.id}</td>
-                <td style={{ padding: '12px', fontWeight: 'bold' }}>{item.title}</td>
+                <td style={{ padding: '12px', fontWeight: 'bold', color: '#007bff' }}>{item.title}</td>
                 <td style={{ padding: '12px', color: '#555' }}>{item.category?.name}</td>
                 <td style={{ padding: '12px', color: '#555' }}>{new Date(item.createdDate).toLocaleDateString('vi-VN')}</td>
               </tr>
             ))}
           </tbody>
         </table>
-
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/post/:id" element={<PostDetail />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
