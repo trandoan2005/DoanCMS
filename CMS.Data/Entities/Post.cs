@@ -2,25 +2,17 @@
 //MSSV:2123110210
 //Lớp:CCQ2311F
 //Ngày tạo: 15/05/2026
-//Mô tả: Quản lí Khách Hàng
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+//Mô tả: Quản lí Bài Viết
 namespace CMS.Data.Entities
 {
     public class Post
-        {
-            public int Id { get; set; }
-            public string Title { get; set; } // Tiêu đề bài viết
-            public string Content { get; set; } // Nội dung chi tiết
-            public string ImageUrl { get; set; } // Hình ảnh đại diện
-            public DateTime CreatedDate { get; set; } = DateTime.Now;
-
-            // Khóa ngoại liên kết tới Category
-            public int CategoryId { get; set; }
-            public virtual Category Category { get; set; }
-        }
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public string? ImageUrl { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public int CategoryId { get; set; }
+        public virtual Category? Category { get; set; }
     }
+}
