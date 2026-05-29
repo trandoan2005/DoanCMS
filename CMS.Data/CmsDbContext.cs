@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using CMS.Data.Entities;
 
 namespace CMS.Data
 {
-    public class CmsDbContext : DbContext
+    public class CmsDbContext : IdentityDbContext<IdentityUser>
     {
         public CmsDbContext(DbContextOptions<CmsDbContext> options) : base(options)
         {
         }
-
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryProduct> CategoryProducts { get; set; }
         public DbSet<Customer> Customers { get; set; }
