@@ -1,0 +1,44 @@
+@model CMS.Data.Entities.CategoryProduct
+
+@{
+    ViewData["Title"] = "Xóa Danh mục sản phẩm";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa Danh mục sản phẩm</h5>
+            </div>
+            <div class="card-body">
+                <p class="lead text-danger fw-semibold">Bạn có chắc chắn muốn xóa danh mục sản phẩm này?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle-fill me-2"></i> Hành động này không thể hoàn tác và có thể ảnh hưởng đến các sản phẩm thuộc danh mục này!
+                </div>
+                
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width: 30%;">Tên danh mục</th>
+                        <td>@Model.Name</td>
+                    </tr>
+                    <tr>
+                        <th>Mô tả</th>
+                        <td>@Model.Description</td>
+                    </tr>
+                </table>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-1"></i> Xóa
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

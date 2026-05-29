@@ -1,0 +1,160 @@
+@model IEnumerable<CMS.Data.Entities.Order>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+
+    string StatusBadge(int status) => status switch
+    {
+        0 => "<span class='badge-status pending'>⏳ Chờ xử lý</span>",
+        1 => "<span class='badge-status shipping'>🚚 Đang giao</span>",
+        2 => "<span class='badge-status done'>✅ Đã giao</span>",
+        _ => "<span class='badge-status'>Không rõ</span>"
+    };
+}
+
+<style>
+    .stats-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .stat-card {
+        flex: 1; min-width: 140px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 18px 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+    .stat-card.active-filter { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.1); }
+    .stat-number { font-size: 28px; font-weight: 800; color: white; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+    .badge-status {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+    }
+    .badge-status.pending { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-status.shipping { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-status.done { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .filter-btn {
+        padding: 7px 18px; border-radius: 8px; font-size: 13px; font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
+        background: transparent; cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); color: white; }
+
+    .order-table { width: 100%; border-collapse: collapse; }
+    .order-table th {
+        padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600;
+        color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .order-table td {
+        padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.8); font-size: 14px; vertical-align: middle;
+    }
+    .order-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .btn-detail {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 14px; border-radius: 8px; font-size: 13px;
+        background: rgba(99,102,241,0.15); color: #818cf8;
+        border: 1px solid rgba(99,102,241,0.25); text-decoration: none; transition: all 0.2s;
+    }
+    .btn-detail:hover { background: rgba(99,102,241,0.25); color: #a5b4fc; }
+
+    .customer-info { display: flex; flex-direction: column; gap: 2px; }
+    .customer-name { font-weight: 600; color: white; }
+    .customer-email { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .total-price { font-weight: 700; color: #4ade80; }
+    .order-id { font-weight: 700; color: rgba(255,255,255,0.5); font-size: 13px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3); }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1" style="color:white; font-weight:700;">🛒 Quản lý đơn hàng</h4>
+        <div class="page-sub">Tổng cộng @Model.Count() đơn hàng đang hiển thị</div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert-success-custom mb-4">✅ @TempData["Success"]</div>
+}
+
+<!-- Stats -->
+<div class="stats-row">
+    <a href="@Url.Action("Index")" class="stat-card @(ViewBag.CurrentStatus == null ? "active-filter" : "")">
+        <div class="stat-number">@ViewBag.TotalOrders</div>
+        <div class="stat-label">📦 Tất cả đơn</div>
+    </a>
+    <a href="@Url.Action("Index", new { status = 0 })" class="stat-card @(ViewBag.CurrentStatus == 0 ? "active-filter" : "")">
+        <div class="stat-number" style="color:#fbbf24;">@ViewBag.PendingOrders</div>
+        <div class="stat-label">⏳ Chờ xử lý</div>
+    </a>
+    <a href="@Url.Action("Index", new { status = 1 })" class="stat-card @(ViewBag.CurrentStatus == 1 ? "active-filter" : "")">
+        <div class="stat-number" style="color:#60a5fa;">@ViewBag.ShippingOrders</div>
+        <div class="stat-label">🚚 Đang giao</div>
+    </a>
+    <a href="@Url.Action("Index", new { status = 2 })" class="stat-card @(ViewBag.CurrentStatus == 2 ? "active-filter" : "")">
+        <div class="stat-number" style="color:#4ade80;">@ViewBag.DoneOrders</div>
+        <div class="stat-label">✅ Đã giao</div>
+    </a>
+</div>
+
+<!-- Table -->
+<div class="glass-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div style="font-size:48px; margin-bottom:12px;">📭</div>
+            <div style="font-size:16px; margin-bottom:6px; color: rgba(255,255,255,0.5);">Chưa có đơn hàng nào</div>
+            <div style="font-size:13px;">Đơn hàng sẽ xuất hiện khi khách hàng đặt mua từ trang web.</div>
+        </div>
+    }
+    else
+    {
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Số SP</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    var total = order.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+                    var itemCount = order.OrderDetails?.Sum(od => od.Quantity) ?? 0;
+                    <tr>
+                        <td><span class="order-id">#@order.Id</span></td>
+                        <td>
+                            <div class="customer-info">
+                                <span class="customer-name">@(order.Customer?.FullName ?? "N/A")</span>
+                                <span class="customer-email">@(order.Customer?.Email ?? "")</span>
+                            </div>
+                        </td>
+                        <td style="color: rgba(255,255,255,0.5); font-size:13px;">
+                            @order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td style="text-align:center;">@itemCount</td>
+                        <td><span class="total-price">@total.ToString("N0")₫</span></td>
+                        <td>@Html.Raw(StatusBadge(order.Status))</td>
+                        <td>
+                            <a href="@Url.Action("Details", new { id = order.Id })" class="btn-detail">
+                                <i class="bi bi-eye"></i> Xem
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -1,0 +1,169 @@
+@model IEnumerable<CMS.Data.Entities.Customer>
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+    var totalCustomers = Model.Count();
+    var activeCustomers = Model.Count(c => c.Orders != null && c.Orders.Any());
+    var totalOrders = Model.Sum(c => c.Orders?.Count() ?? 0);
+    
+    decimal totalSpend = 0;
+    foreach(var c in Model)
+    {
+        if (c.Orders != null)
+        {
+            foreach(var o in c.Orders)
+            {
+                totalSpend += o.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+            }
+        }
+    }
+}
+
+<style>
+    .stats-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .stat-card {
+        flex: 1; min-width: 160px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 18px 20px;
+        transition: all 0.2s;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+    .stat-number { font-size: 28px; font-weight: 800; color: white; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+    .cust-table { width: 100%; border-collapse: collapse; }
+    .cust-table th {
+        padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600;
+        color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .cust-table td {
+        padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.8); font-size: 14px; vertical-align: middle;
+    }
+    .cust-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 12px; border-radius: 8px; font-size: 13px;
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8);
+        border: 1px solid rgba(255,255,255,0.1); text-decoration: none; transition: all 0.2s;
+        cursor: pointer;
+    }
+    .btn-action:hover { background: rgba(255,255,255,0.12); color: white; }
+    .btn-action.btn-view { background: rgba(99,102,241,0.15); color: #818cf8; border-color: rgba(99,102,241,0.25); }
+    .btn-action.btn-view:hover { background: rgba(99,102,241,0.25); color: #a5b4fc; }
+    .btn-action.btn-edit { background: rgba(0,200,255,0.12); color: #00c8ff; border-color: rgba(0,200,255,0.25); }
+    .btn-action.btn-edit:hover { background: rgba(0,200,255,0.2); color: #80e5ff; }
+    
+    .total-spend { font-weight: 700; color: #4ade80; }
+    .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3); }
+    .badge-count { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 100px; font-size: 12px; font-weight: 600; color: white; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1" style="color:white; font-weight:700;">👥 Quản lý khách hàng</h4>
+        <div class="page-sub">Danh sách khách hàng đăng ký tài khoản mua sắm</div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert-success-custom mb-4">✅ @TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert-danger-custom mb-4">⚠️ @TempData["Error"]</div>
+}
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-number">@totalCustomers</div>
+        <div class="stat-label">👥 Tổng khách hàng</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color:#00c8ff;">@activeCustomers</div>
+        <div class="stat-label">🛒 Khách đã mua hàng</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color:#a78bfa;">@totalOrders</div>
+        <div class="stat-label">📦 Tổng đơn đã đặt</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color:#4ade80;">@totalSpend.ToString("N0")₫</div>
+        <div class="stat-label">💰 Tổng doanh thu</div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="glass-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div style="font-size:48px; margin-bottom:12px;">👥</div>
+            <div style="font-size:16px; margin-bottom:6px; color: rgba(255,255,255,0.5);">Chưa có khách hàng nào</div>
+            <div style="font-size:13px;">Khách hàng sẽ xuất hiện khi có người đăng ký tài khoản từ React Store.</div>
+        </div>
+    }
+    else
+    {
+        <table class="cust-table">
+            <thead>
+                <tr>
+                    <th>Tên khách hàng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ giao hàng</th>
+                    <th>Đơn hàng</th>
+                    <th>Tổng chi tiêu</th>
+                    <th style="text-align:center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    int ordersCount = c.Orders?.Count() ?? 0;
+                    decimal customerSpend = 0;
+                    if (c.Orders != null)
+                    {
+                        foreach(var o in c.Orders)
+                        {
+                            customerSpend += o.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+                        }
+                    }
+                    <tr>
+                        <td><strong style="color: white;">@c.FullName</strong></td>
+                        <td style="color: rgba(255,255,255,0.6);">@c.Email</td>
+                        <td>@(string.IsNullOrEmpty(c.Phone) ? "---" : c.Phone)</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(255,255,255,0.5);">
+                            @(string.IsNullOrEmpty(c.Address) ? "---" : c.Address)
+                        </td>
+                        <td>
+                            <span class="badge-count">@ordersCount đơn</span>
+                        </td>
+                        <td><span class="total-spend">@customerSpend.ToString("N0")₫</span></td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="@Url.Action("Details", new { id = c.Id })" class="btn-action btn-view">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                                <a href="@Url.Action("Edit", new { id = c.Id })" class="btn-action btn-edit">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@c.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng @c.FullName? Hành động này không thể hoàn tác!');">
+                                    <button type="submit" class="btn-action" style="background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.25);">
+                                        <i class="bi bi-trash"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

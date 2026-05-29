@@ -1,0 +1,96 @@
+@model CMS.Data.Entities.Customer
+@{
+    ViewData["Title"] = $"Chỉnh sửa {Model.FullName}";
+}
+
+<style>
+    .form-card { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 36px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    
+    .form-control-custom {
+        width: 100%; padding: 12px 16px; border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+        color: white; font-size: 14.5px; transition: all 0.2s; outline: none;
+        box-sizing: border-box;
+    }
+    .form-control-custom:focus {
+        border-color: rgba(99,102,241,0.6);
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        background: rgba(255,255,255,0.06);
+    }
+    
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8);
+        border: 1px solid rgba(255,255,255,0.1); text-decoration: none; transition: all 0.2s;
+        cursor: pointer;
+    }
+    .btn-action:hover { background: rgba(255,255,255,0.12); color: white; }
+    .btn-submit {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none;
+        box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+    }
+    .btn-submit:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); transform: translateY(-1px); }
+
+    .validation-error { color: #f87171; font-size: 12px; margin-top: 4px; display: block; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1" style="color:white; font-weight:700;">📝 Sửa thông tin khách hàng</h4>
+        <div class="page-sub">Cập nhật tài khoản khách hàng #@Model.Id</div>
+    </div>
+    <a href="@Url.Action("Index")" class="btn-action">
+        ← Quay lại danh sách
+    </a>
+</div>
+
+<div class="form-card">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-error"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="FullName" class="form-label">Họ và tên *</label>
+            <input asp-for="FullName" class="form-control-custom" placeholder="Nguyễn Văn A" required />
+            <span asp-validation-for="FullName" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">Địa chỉ Email *</label>
+            <input asp-for="Email" class="form-control-custom" type="email" placeholder="example@gmail.com" required />
+            <span asp-validation-for="Email" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">Số điện thoại</label>
+            <input asp-for="Phone" class="form-control-custom" placeholder="0901234567" />
+            <span asp-validation-for="Phone" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address" class="form-label">Địa chỉ giao nhận</label>
+            <input asp-for="Address" class="form-control-custom" placeholder="123 Đường ABC, Quận 9, TP.HCM" />
+            <span asp-validation-for="Address" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password" class="form-label">Mật khẩu tài khoản *</label>
+            <input asp-for="Password" class="form-control-custom" placeholder="Nhập mật khẩu mới" required />
+            <span asp-validation-for="Password" class="validation-error"></span>
+        </div>
+
+        <div style="margin-top: 36px; display: flex; gap: 14px; justify-content: flex-end;">
+            <a href="@Url.Action("Index")" class="btn-action">Hủy bỏ</a>
+            <button type="submit" class="btn-action btn-submit">
+                <i class="bi bi-save"></i> Lưu cập nhật
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

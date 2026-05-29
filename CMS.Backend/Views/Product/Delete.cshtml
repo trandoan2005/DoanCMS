@@ -1,0 +1,67 @@
+@model CMS.Data.Entities.Product
+
+@{
+    ViewData["Title"] = "Xóa Sản phẩm";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa Sản phẩm</h5>
+            </div>
+            <div class="card-body">
+                <p class="lead text-danger fw-semibold">Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border" style="max-height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center border rounded" style="height: 150px; font-size: 14px;">Không có ảnh</div>
+                        }
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 35%;">Tên sản phẩm</th>
+                                <td><strong>@Model.Name</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Danh mục sản phẩm</th>
+                                <td><span class="badge bg-secondary">@(Model.CategoryProduct?.Name ?? "N/A")</span></td>
+                            </tr>
+                            <tr>
+                                <th>Giá bán</th>
+                                <td class="text-danger fw-semibold">@Model.Price.ToString("N0") ₫</td>
+                            </tr>
+                            <tr>
+                                <th>Số lượng trong kho</th>
+                                <td>@Model.StockQuantity</td>
+                            </tr>
+                            <tr>
+                                <th>Mô tả</th>
+                                <td>@Model.Description</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-1"></i> Xóa sản phẩm
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

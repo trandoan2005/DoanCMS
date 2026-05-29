@@ -1,0 +1,180 @@
+@model CMS.Data.Entities.Customer
+@{
+    ViewData["Title"] = $"Khách hàng {Model.FullName}";
+    
+    decimal totalSpend = 0;
+    if (Model.Orders != null)
+    {
+        foreach(var o in Model.Orders)
+        {
+            totalSpend += o.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+        }
+    }
+
+    string StatusBadge(int status) => status switch
+    {
+        0 => "<span class='badge-status pending'>⏳ Chờ xử lý</span>",
+        1 => "<span class='badge-status shipping'>🚚 Đang giao</span>",
+        2 => "<span class='badge-status done'>✅ Đã giao</span>",
+        _ => "<span class='badge-status'>Không rõ</span>"
+    };
+}
+
+<style>
+    .detail-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+    @@media (max-width: 768px) {
+        .detail-grid { grid-template-columns: 1fr; }
+    }
+    
+    .profile-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px; }
+    .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; color: white; margin-bottom: 20px; text-transform: uppercase; }
+    
+    .info-group { margin-bottom: 18px; }
+    .info-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .info-val { font-size: 15px; color: white; font-weight: 500; }
+
+    .order-history-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px; }
+    
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 12px; border-radius: 8px; font-size: 13px;
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8);
+        border: 1px solid rgba(255,255,255,0.1); text-decoration: none; transition: all 0.2s;
+    }
+    .btn-action:hover { background: rgba(255,255,255,0.12); color: white; }
+
+    .badge-status {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+    }
+    .badge-status.pending { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-status.shipping { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-status.done { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+
+    .order-table { width: 100%; border-collapse: collapse; }
+    .order-table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .order-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); font-size: 14px; }
+    .order-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1" style="color:white; font-weight:700;">👤 Hồ sơ khách hàng</h4>
+        <div class="page-sub">Chi tiết thông tin cá nhân và lịch sử hoạt động</div>
+    </div>
+    <a href="@Url.Action("Index")" class="btn-action">
+        ← Quay lại danh sách
+    </a>
+</div>
+
+<div class="detail-grid">
+    <!-- Left: Profile Card -->
+    <div>
+        <div class="profile-card">
+            @{
+                var initials = "";
+                if (!string.IsNullOrEmpty(Model.FullName))
+                {
+                    var parts = Model.FullName.Split(' ');
+                    initials = parts.Length > 1 ? parts[0][0].ToString() + parts[parts.Length - 1][0].ToString() : Model.FullName[0].ToString();
+                }
+            }
+            <div class="profile-avatar">@initials</div>
+            
+            <div class="info-group">
+                <div class="info-label">Tên khách hàng</div>
+                <div class="info-val" style="font-size: 18px; font-weight: 700;">@Model.FullName</div>
+            </div>
+            
+            <div class="info-group">
+                <div class="info-label">Địa chỉ Email</div>
+                <div class="info-val">@Model.Email</div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Số điện thoại</div>
+                <div class="info-val">@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cung cấp" : Model.Phone)</div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Địa chỉ mặc định</div>
+                <div class="info-val">@(string.IsNullOrEmpty(Model.Address) ? "Chưa cung cấp" : Model.Address)</div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Mật khẩu (Khách hàng)</div>
+                <div class="info-val" style="font-family: monospace; background: rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 6px; display: inline-block;">
+                    @Model.Password
+                </div>
+            </div>
+
+            <div class="info-group" style="margin-top: 32px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
+                <div class="info-label">Tổng chi tiêu tích lũy</div>
+                <div class="info-val" style="font-size: 24px; font-weight: 800; color: #4ade80;">@totalSpend.ToString("N0")₫</div>
+            </div>
+
+            <div style="margin-top: 28px; display: flex; gap: 12px;">
+                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn-action" style="flex: 1; text-align: center; justify-content: center; background: rgba(0,200,255,0.15); color: #00c8ff; border-color: rgba(0,200,255,0.25);">
+                    <i class="bi bi-pencil"></i> Chỉnh sửa
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Order History -->
+    <div>
+        <div class="order-history-card">
+            <h5 style="color: white; font-weight: 700; margin-bottom: 20px;">📦 Lịch sử đặt hàng (@(Model.Orders?.Count() ?? 0) đơn)</h5>
+            
+            @if (Model.Orders == null || !Model.Orders.Any())
+            {
+                <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4);">
+                    <div style="font-size: 36px; margin-bottom: 10px;">🛒</div>
+                    Khách hàng này chưa thực hiện bất kỳ giao dịch nào.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Ngày đặt</th>
+                                <th>Sản phẩm đặt mua</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.Orders.OrderByDescending(ord => ord.OrderDate))
+                            {
+                                var total = o.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+                                <tr>
+                                    <td><strong style="color: white;">#@o.Id</strong></td>
+                                    <td style="font-size: 13px; color: rgba(255,255,255,0.5);">@o.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div style="font-size: 13px;">
+                                            @if (o.OrderDetails != null)
+                                            {
+                                                @string.Join(", ", o.OrderDetails.Select(od => $"{od.Product?.Name} (x{od.Quantity})"))
+                                            }
+                                        </div>
+                                    </td>
+                                    <td><strong style="color:#4ade80;">@total.ToString("N0")₫</strong></td>
+                                    <td>@Html.Raw(StatusBadge(o.Status))</td>
+                                    <td>
+                                        <a href="@Url.Action("Details", "Order", new { id = o.Id })" class="btn-action" style="padding: 4px 10px; font-size: 12px; background: rgba(99,102,241,0.15); color: #818cf8; border-color: rgba(99,102,241,0.25);">
+                                            Chi tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
