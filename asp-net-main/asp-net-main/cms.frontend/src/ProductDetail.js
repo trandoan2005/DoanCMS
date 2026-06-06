@@ -12,6 +12,32 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState('desc'); // 'desc' | 'specs' | 'shipping'
 
+  const handleCardMouseMove = (e) => {
+    const card = e.currentTarget;
+    const box = card.getBoundingClientRect();
+    const x = e.clientX - box.left - box.width / 2;
+    const y = e.clientY - box.top - box.height / 2;
+    const rotX = -(y / box.height) * 12;
+    const rotY = (x / box.width) * 12;
+    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px) scale(1.01)`;
+    
+    const shine = card.querySelector('.shine-overlay');
+    if (shine) {
+      const px = (e.clientX - box.left) / box.width * 100;
+      const py = (e.clientY - box.top) / box.height * 100;
+      shine.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.2) 0%, transparent 60%)`;
+    }
+  };
+
+  const handleCardMouseLeave = (e) => {
+    const card = e.currentTarget;
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)`;
+    const shine = card.querySelector('.shine-overlay');
+    if (shine) {
+      shine.style.background = 'transparent';
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     // Cuộn lên đầu trang khi thay đổi ID sản phẩm
@@ -81,7 +107,7 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
     : [];
 
   return (
-    <div style={{ padding: '40px 24px 80px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+    <div className="page-transition" style={{ padding: '40px 24px 80px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
       {/* Breadcrumbs & Back Button */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '15px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
@@ -106,10 +132,86 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
         .hover-link:hover { color: white !important; }
         .tab-btn { transition: all 0.3s ease; border-bottom: 2px solid transparent !important; }
         .tab-btn.active { color: #00c8ff !important; border-bottom: 2px solid #00c8ff !important; }
-        .related-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important; }
-        .related-card { transition: all 0.3s ease; }
+        .related-card {
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.1s ease, border-color 0.4s, box-shadow 0.4s;
+        }
+        .related-card:hover {
+          border-color: rgba(0,200,255,0.35) !important;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+        }
+        .related-card::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -150%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.15) 30%,
+            rgba(255, 255, 255, 0.25) 50%,
+            rgba(255, 255, 255, 0.15) 70%,
+            transparent
+          );
+          transform: skewX(-25deg);
+          transition: none;
+          pointer-events: none;
+          z-index: 6;
+        }
+        .related-card:hover::after {
+          left: 150%;
+          transition: left 0.8s ease-in-out;
+        }
+        .add-cart-btn {
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          overflow: hidden;
+        }
+        .add-cart-btn:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 12px 30px rgba(99, 102, 241, 0.45);
+        }
+        .add-cart-btn::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -150%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.25) 30%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0.25) 70%,
+            transparent
+          );
+          transform: skewX(-25deg);
+          transition: none;
+          pointer-events: none;
+        }
+        .add-cart-btn:hover::after {
+          left: 150%;
+          transition: left 0.8s ease-in-out;
+        }
         .img-container:hover img { transform: scale(1.06); }
         .img-container img { transition: transform 0.6s cubic-bezier(0.15, 1, 0.3, 1); }
+        @keyframes iosSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(24px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .page-transition {
+          animation: iosSlideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
       `}</style>
 
       {/* Main product display */}
@@ -200,26 +302,26 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
           {/* Tab Content */}
           <div style={{ minHeight: '100px', fontSize: '14.5px', lineHeight: '1.6', color: 'rgba(255,255,255,0.7)', marginBottom: '32px' }}>
             {activeTab === 'desc' && (
-              <p style={{ margin: 0 }}>{product.description || 'Không có mô tả sản phẩm chi tiết cho mặt hàng này. Đây là sản phẩm thời trang cao cấp thuộc bộ sưu tập mới của cửa hàng chúng tôi, được tuyển chọn kỹ lưỡng về chất liệu và phom dáng.'}</p>
+              <p style={{ margin: 0 }}>{product.description || 'Không có mô tả sản phẩm chi tiết cho mặt hàng này. Đây là giống cá cảnh đẹp được tuyển chọn kỹ lưỡng từ các trại nuôi uy tín, đảm bảo sức khỏe tốt và màu sắc rực rỡ.'}</p>
             )}
             {activeTab === 'specs' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
                   <span style={{ color: 'rgba(255,255,255,0.4)' }}>Danh mục</span>
-                  <span>{product.categoryProduct?.name || 'Thời trang'}</span>
+                  <span>{product.categoryProduct?.name || 'Cá cảnh'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Chất liệu</span>
-                  <span>100% Premium Cotton cao cấp</span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Nguồn gốc</span>
+                  <span>Nhập khẩu / Thuần chủng</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Thương hiệu</span>
-                  <span>DoanCMS Premium Exclusive</span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Cửa hàng</span>
+                  <span>DoanCMS Aquarium</span>
                 </div>
               </div>
             )}
             {activeTab === 'shipping' && (
-              <p style={{ margin: 0, color: '#a29bfe' }}>⚡ Giao hàng hỏa tốc trong nội thành TP.HCM chỉ từ 2-4 tiếng. Các khu vực tỉnh thành khác từ 2-3 ngày làm việc. Miễn phí vận chuyển cho đơn hàng trị giá từ 500,000₫ trở lên!</p>
+              <p style={{ margin: 0, color: '#a29bfe' }}>⚡ Giao cá cảnh sống an toàn và bảo hành vận chuyển trong nội thành TP.HCM chỉ từ 2-4 tiếng. Cam kết hoàn tiền 100% nếu cá có vấn đề khi giao nhận. Miễn phí vận chuyển đơn hàng từ 500,000₫ trở lên!</p>
             )}
           </div>
 
@@ -246,6 +348,7 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
               {/* Add to cart Button */}
               <button
                 onClick={handleAddToCart}
+                className="add-cart-btn"
                 style={{
                   flex: 1, padding: '16px', borderRadius: '16px', border: 'none',
                   background: added ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
@@ -291,24 +394,26 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
       {relatedProducts.length > 0 && (
         <div style={{ marginTop: '80px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0, letterSpacing: '-0.5px' }}>🛍️ Sản phẩm tương thích khác</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0, letterSpacing: '-0.5px' }}>🐠 Cá cảnh khác tại cửa hàng</h2>
             <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(0,200,255,0.4), transparent)' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
             {relatedProducts.map((p, idx) => (
-              <div key={p.id} className="related-card" onClick={() => navigate(`/product/${p.id}`)} style={{
+              <div key={p.id} className="related-card" onClick={() => navigate(`/product/${p.id}`)} onMouseMove={handleCardMouseMove} onMouseLeave={handleCardMouseLeave} style={{
                 background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px',
-                overflow: 'hidden', cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                overflow: 'hidden', cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                position: 'relative'
               }}>
-                <div style={{ height: '180px', overflow: 'hidden', position: 'relative' }}>
+                <div className="shine-overlay" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'background 0.1s ease', zIndex: 5 }} />
+                <div style={{ height: '180px', overflow: 'hidden', position: 'relative', zIndex: 6 }}>
                   <img src={p.imageUrl || `https://picsum.photos/400/300?random=${p.id}`} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.src = `https://picsum.photos/400/300?random=${p.id}`} />
                   <div style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(0,0,0,0.5)', padding: '2px 10px', borderRadius: '100px', fontSize: '10px', color: '#00c8ff', border: '1px solid rgba(0,200,255,0.3)', backdropFilter: 'blur(5px)' }}>
                     {product.categoryProduct?.name || 'Sản phẩm'}
                   </div>
                 </div>
-                <div style={{ padding: '16px' }}>
+                <div style={{ padding: '16px', position: 'relative', zIndex: 6 }}>
                   <h4 style={{ margin: '0 0 8px', fontSize: '14.5px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</h4>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '15px', fontWeight: '800', color: '#ff6b8b' }}>{p.price ? p.price.toLocaleString('vi-VN') + ' ₫' : 'Liên hệ'}</span>

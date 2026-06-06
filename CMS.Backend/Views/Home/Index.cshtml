@@ -1,8 +1,201 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using CMS.Data.Entities
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var recentOrders    = ViewBag.RecentOrders    as List<Order>   ?? new List<Order>();
+    var lowStockProducts= ViewBag.LowStockProducts as List<Product> ?? new List<Product>();
+    decimal revenue     = ViewBag.TotalRevenue;
+
+    string StatusLabel(int s) => s switch { 0 => "Chờ xử lý", 1 => "Đang giao", 2 => "Đã giao", _ => "?" };
+    string StatusColor(int s) => s switch { 0 => "#f59e0b", 1 => "#3b82f6", 2 => "#10b981", _ => "#6b7280" };
+    string StatusBg(int s)    => s switch { 0 => "rgba(245,158,11,0.12)", 1 => "rgba(59,130,246,0.12)", 2 => "rgba(16,185,129,0.12)", _ => "rgba(107,114,128,0.12)" };
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome-Trần Văn Đoàn </h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- ═══════════════════════════════════════
+     GREETING BANNER
+══════════════════════════════════════════ -->
+<div style="background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(139,92,246,0.15));
+            border:1px solid rgba(99,102,241,0.25);border-radius:20px;
+            padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:20px;">
+    <div style="font-size:44px;">👋</div>
+    <div>
+        <div style="font-size:22px;font-weight:800;color:white;margin-bottom:4px;">
+            Chào mừng, Trần Văn Đoàn!
+        </div>
+        <div style="font-size:13.5px;color:rgba(255,255,255,0.5);">
+            DoanCMS Admin Panel · CCQ2311F · MSSV 2123110210 · Cao Đẳng Công Thương TPHCM
+        </div>
+    </div>
+    <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:4px;">Doanh thu (đơn đã giao)</div>
+        <div style="font-size:26px;font-weight:900;color:#ff6b8b;text-shadow:0 0 20px rgba(255,107,139,0.3);">
+            @revenue.ToString("N0") ₫
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     STAT CARDS – ROW 1  (4 cols)
+══════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;">
+    @foreach (var s in new[]{
+        new { Icon="🛍️", Label="Sản phẩm",        Value=(int)ViewBag.TotalProducts,      Url="/Product",        Grad="linear-gradient(135deg,#6366f1,#8b5cf6)" },
+        new { Icon="📰", Label="Bài viết",          Value=(int)ViewBag.TotalPosts,          Url="/Post",           Grad="linear-gradient(135deg,#ec4899,#f43f5e)" },
+        new { Icon="👥", Label="Khách hàng",        Value=(int)ViewBag.TotalCustomers,      Url="/Customer",       Grad="linear-gradient(135deg,#0ea5e9,#06b6d4)" },
+        new { Icon="🛒", Label="Tổng đơn hàng",    Value=(int)ViewBag.TotalOrders,         Url="/Order",          Grad="linear-gradient(135deg,#10b981,#059669)" },
+    })
+    {
+        <a href="@s.Url" style="text-decoration:none;">
+            <div class="stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+                         border-radius:18px;padding:22px 24px;transition:all 0.3s;cursor:pointer;">
+                <div style="width:44px;height:44px;border-radius:12px;background:@s.Grad;
+                             display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;">
+                    @s.Icon
+                </div>
+                <div style="font-size:30px;font-weight:900;color:white;line-height:1;">@s.Value</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:6px;">@s.Label</div>
+            </div>
+        </a>
+    }
+</div>
+
+<!-- ═══════════════════════════════════════
+     STAT CARDS – ROW 2  (4 cols)
+══════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+    @foreach (var s in new[]{
+        new { Icon="🏷️", Label="Danh mục bài viết", Value=(int)ViewBag.TotalCategories,    Url="/Category",       Color="#a78bfa" },
+        new { Icon="📦", Label="Danh mục SP",        Value=(int)ViewBag.TotalCategoryProds,  Url="/CategoryProduct", Color="#34d399" },
+        new { Icon="⏳", Label="Chờ xử lý",         Value=(int)ViewBag.PendingOrders,       Url="/Order?status=0", Color="#fbbf24" },
+        new { Icon="🚚", Label="Đang giao",          Value=(int)ViewBag.ShippingOrders,      Url="/Order?status=1", Color="#60a5fa" },
+    })
+    {
+        <a href="@s.Url" style="text-decoration:none;">
+            <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+                         border-radius:18px;padding:20px 22px;transition:all 0.3s;cursor:pointer;">
+                <div style="font-size:26px;margin-bottom:10px;">@s.Icon</div>
+                <div style="font-size:26px;font-weight:800;color:@s.Color;">@s.Value</div>
+                <div style="font-size:12.5px;color:rgba(255,255,255,0.4);margin-top:5px;">@s.Label</div>
+            </div>
+        </a>
+    }
+</div>
+
+<!-- ═══════════════════════════════════════
+     BOTTOM GRID  (2 cols)
+══════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+    <!-- Đơn hàng mới nhất -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:15px;font-weight:700;color:white;">🕐 Đơn hàng mới nhất</div>
+            <a href="/Order" style="font-size:12px;color:#a5b4fc;text-decoration:none;">Xem tất cả →</a>
+        </div>
+        <div style="padding:8px 0;">
+            @if (!recentOrders.Any())
+            {
+                <div style="padding:32px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;">Chưa có đơn hàng nào</div>
+            }
+            @foreach (var o in recentOrders)
+            {
+                decimal total = o.OrderDetails?.Sum(od => od.Quantity * od.UnitPrice) ?? 0;
+                <a href="/Order/Details/@o.Id" style="text-decoration:none;">
+                    <div style="padding:12px 22px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#a5b4fc;flex-shrink:0;">
+                            #@o.Id
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                @(o.Customer?.FullName ?? "Khách ẩn danh")
+                            </div>
+                            <div style="font-size:11.5px;color:rgba(255,255,255,0.35);margin-top:2px;">
+                                @o.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:13.5px;font-weight:700;color:#ff6b8b;">@total.ToString("N0")₫</div>
+                            <span style="font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:100px;
+                                         color:@StatusColor(o.Status);background:@StatusBg(o.Status);">
+                                @StatusLabel(o.Status)
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Sản phẩm tồn kho thấp -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:15px;font-weight:700;color:white;">⚠️ Sản phẩm tồn kho thấp</div>
+            <a href="/Product" style="font-size:12px;color:#a5b4fc;text-decoration:none;">Xem tất cả →</a>
+        </div>
+        <div style="padding:8px 0;">
+            @if (!lowStockProducts.Any())
+            {
+                <div style="padding:32px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;">Không có sản phẩm nào sắp hết hàng</div>
+            }
+            @foreach (var p in lowStockProducts)
+            {
+                var stockColor = p.StockQuantity <= 3 ? "#f87171" : p.StockQuantity <= 10 ? "#fbbf24" : "#34d399";
+                var stockBg    = p.StockQuantity <= 3 ? "rgba(248,113,113,0.12)" : p.StockQuantity <= 10 ? "rgba(251,191,36,0.12)" : "rgba(52,211,153,0.12)";
+                <a href="/Product/Edit/@p.Id" style="text-decoration:none;">
+                    <div style="padding:12px 22px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.05);">
+                            @if (!string.IsNullOrEmpty(p.ImageUrl))
+                            {
+                                <img src="@p.ImageUrl" alt="@p.Name" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'" />
+                            }
+                            else
+                            {
+                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;">📦</div>
+                            }
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                @p.Name
+                            </div>
+                            <div style="font-size:11.5px;color:rgba(255,255,255,0.35);margin-top:2px;">
+                                @p.Price.ToString("N0") ₫
+                            </div>
+                        </div>
+                        <span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;
+                                     color:@stockColor;background:@stockBg;flex-shrink:0;">
+                            Còn @p.StockQuantity
+                        </span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     QUICK ACTIONS
+══════════════════════════════════════════ -->
+<div style="margin-top:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+            border-radius:18px;padding:22px 24px;">
+    <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;">⚡ Thao tác nhanh</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        @foreach (var q in new[]{
+            new { Icon="➕", Label="Thêm sản phẩm",    Url="/Product/Create",         Color="rgba(99,102,241,0.3)",  Border="rgba(99,102,241,0.4)"  },
+            new { Icon="✏️", Label="Viết bài viết",     Url="/Post/Create",             Color="rgba(236,72,153,0.3)",  Border="rgba(236,72,153,0.4)"  },
+            new { Icon="📦", Label="Thêm danh mục SP",  Url="/CategoryProduct/Create",  Color="rgba(16,185,129,0.3)",  Border="rgba(16,185,129,0.4)"  },
+            new { Icon="🏷️", Label="Thêm danh mục BV", Url="/Category/Create",          Color="rgba(245,158,11,0.3)",  Border="rgba(245,158,11,0.4)"  },
+            new { Icon="📋", Label="Xem tất cả đơn",   Url="/Order",                   Color="rgba(14,165,233,0.3)",  Border="rgba(14,165,233,0.4)"  },
+        })
+        {
+            <a href="@q.Url" style="display:flex;align-items:center;gap:8px;padding:11px 18px;
+                                     border-radius:12px;text-decoration:none;color:white;font-size:13.5px;font-weight:600;
+                                     background:@q.Color;border:1px solid @q.Border;transition:all 0.2s;"
+               onmouseover="this.style.opacity='0.8';this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+                @q.Icon @q.Label
+            </a>
+        }
+    </div>
 </div>

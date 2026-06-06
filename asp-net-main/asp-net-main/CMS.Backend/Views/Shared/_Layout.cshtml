@@ -1,49 +1,862 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CMS.Backend</title>
+    <title>@ViewData["Title"] - CMS Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/CMS.Backend.styles.css" asp-append-version="true" />
+    <style>
+        /* ═══════════════════════════════════════════════════
+           iOS LIGHT LIQUID GLASS - Admin Panel Design System
+           ═══════════════════════════════════════════════════ */
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(150deg, #f0f4ff 0%, #e8f0fe 40%, #dce8ff 75%, #ede9fe 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* ── Blob Backgrounds ── */
+        .blob-container {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+        }
+
+        .blob-1 {
+            width: 600px; height: 600px;
+            background: #93c5fd;
+            opacity: 0.18;
+            top: -150px; left: -100px;
+            animation: blobMorph1 20s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            width: 500px; height: 500px;
+            background: #c4b5fd;
+            opacity: 0.15;
+            bottom: -100px; right: -80px;
+            animation: blobMorph2 25s ease-in-out infinite;
+        }
+
+        .blob-3 {
+            width: 400px; height: 400px;
+            background: #67e8f9;
+            opacity: 0.13;
+            top: 40%; left: 40%;
+            animation: blobMorph3 22s ease-in-out infinite;
+        }
+
+        .blob-4 {
+            width: 450px; height: 450px;
+            background: #a5f3fc;
+            opacity: 0.12;
+            bottom: 20%; left: -80px;
+            animation: blobMorph1 28s ease-in-out infinite reverse;
+        }
+
+        @@keyframes blobMorph1 {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0,0) scale(1); }
+            33% { border-radius: 40% 60% 55% 45% / 45% 60% 40% 55%; transform: translate(60px, 50px) scale(1.08); }
+            66% { border-radius: 55% 45% 70% 30% / 50% 35% 65% 50%; transform: translate(-40px, 80px) scale(0.95); }
+        }
+
+        @@keyframes blobMorph2 {
+            0%, 100% { border-radius: 50% 50% 30% 70% / 55% 60% 40% 70%; transform: translate(0,0) scale(1); }
+            50% { border-radius: 65% 35% 60% 40% / 40% 70% 30% 60%; transform: translate(-70px, -50px) scale(1.1); }
+        }
+
+        @@keyframes blobMorph3 {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 50% 40% 60% 50%; transform: translate(0,0) rotate(0deg); }
+            50% { border-radius: 60% 40% 40% 60% / 60% 50% 50% 40%; transform: translate(50px, -60px) rotate(15deg); }
+        }
+
+        /* ── Page Fade In ── */
+        @@keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @@keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── App Shell ── */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ════════════════════════════════
+           SIDEBAR
+           ════════════════════════════════ */
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(30px) saturate(160%);
+            -webkit-backdrop-filter: blur(30px) saturate(160%);
+            border-right: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 4px 0 30px rgba(99, 102, 241, 0.06), 2px 0 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 10px; }
+
+        /* Logo area */
+        .sidebar-logo {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.4);
+        }
+
+        .sidebar-logo a {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 17px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-subtitle {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Nav sections */
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 8px 10px 6px;
+            margin-top: 8px;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        .nav-item-link:hover {
+            background: rgba(99, 102, 241, 0.09);
+            color: #6366f1;
+            transform: translateX(3px);
+        }
+
+        .nav-item-link.active {
+            background: rgba(99, 102, 241, 0.14);
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        .nav-item-link.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%; transform: translateY(-50%);
+            width: 3px; height: 20px;
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon {
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Sidebar footer */
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid rgba(203,213,225,0.4);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-footer a:hover {
+            background: rgba(239, 68, 68, 0.08);
+            transform: translateX(3px);
+        }
+
+        /* ════════════════════════════════
+           TOPBAR
+           ════════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0; left: 260px; right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(25px) saturate(160%);
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 2px 20px rgba(99, 102, 241, 0.06), 0 1px 8px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 99;
+            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .topbar-left {
+            display: flex; align-items: center; gap: 16px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+
+        .breadcrumb-bar {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .topbar-right {
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .topbar-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6366f1;
+        }
+
+        .user-avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: white; font-weight: 700;
+            box-shadow: 0 2px 10px rgba(99,102,241,0.3);
+        }
+
+        .logout-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 10px;
+            color: #dc2626;
+            font-size: 13px; font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239,68,68,0.15);
+            color: #dc2626;
+        }
+
+        /* ════════════════════════════════
+           MAIN CONTENT AREA
+           ════════════════════════════════ */
+        .main-content {
+            margin-left: 260px;
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+            padding: 28px 32px;
+            animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* ════════════════════════════════
+           GLASS CARDS
+           ════════════════════════════════ */
+        .card, .table-responsive, .glass-card {
+            background: rgba(255, 255, 255, 0.68) !important;
+            backdrop-filter: blur(20px) saturate(140%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.85) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.07), 0 2px 8px rgba(0,0,0,0.05) !important;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 16px 48px rgba(99, 102, 241, 0.12), 0 4px 16px rgba(0,0,0,0.07) !important;
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: rgba(248, 250, 252, 0.75) !important;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5) !important;
+            border-radius: 18px 18px 0 0 !important;
+            padding: 16px 22px !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            font-size: 15px;
+        }
+
+        .card-body {
+            padding: 22px !important;
+            color: #334155;
+        }
+
+        /* ════════════════════════════════
+           TABLES
+           ════════════════════════════════ */
+        .table {
+            color: #334155 !important;
+        }
+
+        .table thead th {
+            background: rgba(248, 250, 252, 0.85) !important;
+            color: #475569 !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.8px !important;
+            text-transform: uppercase !important;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5) !important;
+            padding: 12px 16px !important;
+        }
+
+        .table tbody td {
+            color: #334155 !important;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.3) !important;
+            padding: 13px 16px !important;
+            vertical-align: middle !important;
+            font-size: 14px;
+        }
+
+        .table tbody tr {
+            transition: background 0.15s ease;
+        }
+
+        .table tbody tr:hover td {
+            background: rgba(99, 102, 241, 0.04) !important;
+        }
+
+        /* ════════════════════════════════
+           BUTTONS
+           ════════════════════════════════ */
+        .btn {
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            font-size: 13.5px !important;
+            padding: 8px 18px !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: none !important;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px) scale(1.02) !important;
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98) !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 24px rgba(99,102,241,0.45) !important;
+            color: white !important;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.3) !important;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 24px rgba(16,185,129,0.4) !important;
+            color: white !important;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(239,68,68,0.3) !important;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 24px rgba(239,68,68,0.4) !important;
+            color: white !important;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(245,158,11,0.3) !important;
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 8px 24px rgba(245,158,11,0.4) !important;
+            color: white !important;
+        }
+
+        .btn-secondary {
+            background: rgba(100, 116, 139, 0.12) !important;
+            color: #475569 !important;
+            border: 1px solid rgba(203,213,225,0.7) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 116, 139, 0.2) !important;
+            color: #334155 !important;
+        }
+
+        .btn-sm {
+            padding: 5px 12px !important;
+            font-size: 12px !important;
+        }
+
+        /* ════════════════════════════════
+           FORMS
+           ════════════════════════════════ */
+        .form-label, label {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 6px !important;
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.82) !important;
+            border: 1px solid rgba(203, 213, 225, 0.8) !important;
+            border-radius: 10px !important;
+            color: #1e293b !important;
+            font-size: 14px !important;
+            padding: 9px 14px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14) !important;
+            background: rgba(255,255,255,0.95) !important;
+            outline: none !important;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* ════════════════════════════════
+           BADGES / PILLS
+           ════════════════════════════════ */
+        .badge {
+            border-radius: 100px !important;
+            padding: 4px 10px !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+        }
+
+        .badge.bg-primary, .badge.bg-info {
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: #6366f1 !important;
+        }
+
+        .badge.bg-success {
+            background: rgba(16, 185, 129, 0.12) !important;
+            color: #059669 !important;
+        }
+
+        .badge.bg-danger {
+            background: rgba(239, 68, 68, 0.12) !important;
+            color: #dc2626 !important;
+        }
+
+        .badge.bg-warning {
+            background: rgba(245, 158, 11, 0.12) !important;
+            color: #d97706 !important;
+        }
+
+        .badge.bg-secondary {
+            background: rgba(100, 116, 139, 0.12) !important;
+            color: #475569 !important;
+        }
+
+        /* ════════════════════════════════
+           PAGE HEADER SECTION
+           ════════════════════════════════ */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-header h2, .page-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.4px;
+        }
+
+        /* ════════════════════════════════
+           ALERTS
+           ════════════════════════════════ */
+        .alert {
+            border-radius: 12px !important;
+            border: none !important;
+            padding: 14px 18px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+        }
+
+        .alert-success {
+            background: rgba(16,185,129,0.1) !important;
+            color: #065f46 !important;
+            border-left: 4px solid #10b981 !important;
+        }
+
+        .alert-danger {
+            background: rgba(239,68,68,0.1) !important;
+            color: #991b1b !important;
+            border-left: 4px solid #ef4444 !important;
+        }
+
+        .alert-warning {
+            background: rgba(245,158,11,0.1) !important;
+            color: #78350f !important;
+            border-left: 4px solid #f59e0b !important;
+        }
+
+        .alert-info {
+            background: rgba(99,102,241,0.08) !important;
+            color: #3730a3 !important;
+            border-left: 4px solid #6366f1 !important;
+        }
+
+        /* ════════════════════════════════
+           FOOTER
+           ════════════════════════════════ */
+        .admin-footer {
+            margin-left: 260px;
+            padding: 16px 32px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(203,213,225,0.4);
+            color: #94a3b8;
+            font-size: 12.5px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.35); }
+
+        /* ── Utility ── */
+        a { text-decoration: none; }
+        img { border-radius: 8px; }
+
+        @@media (max-width: 768px) {
+            .sidebar { width: 0; overflow: hidden; }
+            .topbar { left: 0; }
+            .main-content { margin-left: 0; }
+            .admin-footer { margin-left: 0; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CMS.Backend</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <!-- Animated Background Blobs -->
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - CMS.Backend - Cao Đẳng Công Thương TPHCM  <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- App Shell -->
+    <div class="app-shell">
+
+        <!-- ═══════════════════════════
+             SIDEBAR
+             ═══════════════════════════ -->
+        <aside class="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <a asp-controller="Home" asp-action="Index">
+                    <div class="logo-icon">🛡️</div>
+                    <div>
+                        <div class="logo-text">CMS Admin</div>
+                        <div class="logo-subtitle">MANAGEMENT PANEL</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+
+                <!-- Dashboard -->
+                <div class="nav-section-label">Tổng quan</div>
+                <a asp-controller="Home" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                    <span class="nav-icon">🏠</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- Nội dung -->
+                <div class="nav-section-label" style="margin-top:12px">Nội dung</div>
+                <a asp-controller="Category" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")">
+                    <span class="nav-icon">📂</span>
+                    <span>Danh mục bài viết</span>
+                </a>
+                <a asp-controller="Post" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Post" ? "active" : "")">
+                    <span class="nav-icon">📝</span>
+                    <span>Bài viết</span>
+                </a>
+
+                <!-- Sản phẩm -->
+                <div class="nav-section-label" style="margin-top:12px">Sản phẩm</div>
+                <a asp-controller="CategoryProduct" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "CategoryProduct" ? "active" : "")">
+                    <span class="nav-icon">🗂️</span>
+                    <span>Danh mục sản phẩm</span>
+                </a>
+                <a asp-controller="Product" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" ? "active" : "")">
+                    <span class="nav-icon">🛍️</span>
+                    <span>Sản phẩm</span>
+                </a>
+
+                <!-- Đơn hàng -->
+                <div class="nav-section-label" style="margin-top:12px">Kinh doanh</div>
+                <a asp-controller="Order" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "active" : "")">
+                    <span class="nav-icon">📦</span>
+                    <span>Đơn hàng</span>
+                </a>
+                <a asp-controller="OrderDetail" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "OrderDetail" ? "active" : "")">
+                    <span class="nav-icon">📋</span>
+                    <span>Chi tiết đơn hàng</span>
+                </a>
+
+                <!-- Người dùng -->
+                <div class="nav-section-label" style="margin-top:12px">Tài khoản</div>
+                <a asp-controller="Customer" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Customer" ? "active" : "")">
+                    <span class="nav-icon">👥</span>
+                    <span>Khách hàng</span>
+                </a>
+                <a asp-controller="User" asp-action="Index" class="nav-item-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active" : "")">
+                    <span class="nav-icon">👤</span>
+                    <span>Quản trị viên</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Account" asp-action="Logout">
+                        <span>🚪</span>
+                        <span>Đăng xuất</span>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">
+                        <span style="color:#6366f1">🔑</span>
+                        <span style="color:#6366f1">Đăng nhập</span>
+                    </a>
+                }
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════
+             MAIN WRAPPER (Topbar + Content)
+             ═══════════════════════════ -->
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <div>
+                        <div class="page-title">@(ViewData["Title"] ?? "Dashboard")</div>
+                        <div class="breadcrumb-bar">
+                            CMS Admin
+                            @{
+                                var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
+                                var action = ViewContext.RouteData.Values["action"]?.ToString();
+                                if (!string.IsNullOrEmpty(ctrl) && ctrl != "Home")
+                                {
+                                    <text> / @ctrl</text>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <div class="topbar-badge">
+                            <span>✨</span>
+                            <span>Xin chào, @User.Identity.Name</span>
+                        </div>
+                        <div class="user-avatar">
+                            @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "A")
+                        </div>
+                        <a class="logout-btn" asp-controller="Account" asp-action="Logout">
+                            🚪 Đăng xuất
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="logout-btn" asp-controller="Account" asp-action="Login" style="color:#6366f1; border-color:rgba(99,102,241,0.25); background:rgba(99,102,241,0.08);">
+                            🔑 Đăng nhập
+                        </a>
+                    }
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content" role="main">
+                @RenderBody()
+            </main>
+
+            <!-- FOOTER -->
+            <footer class="admin-footer">
+                <span>© 2026 CMS Admin — Cao Đẳng Công Thương TPHCM</span>
+                <span style="color:#c7d2fe; font-size:11px;">iOS Light Liquid Glass v2.0</span>
+            </footer>
         </div>
-    </footer>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Highlight active nav item based on current URL
+        (function () {
+            const links = document.querySelectorAll('.nav-item-link');
+            const path = window.location.pathname.toLowerCase();
+            links.forEach(link => {
+                if (link.href && link.href !== '#') {
+                    const url = new URL(link.href);
+                    if (path !== '/' && url.pathname !== '/' && path.startsWith(url.pathname.toLowerCase())) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+        })();
+
+        // Ripple effect on buttons
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn');
+            if (!btn) return;
+            const circle = document.createElement('span');
+            const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+            const rect = btn.getBoundingClientRect();
+            circle.style.cssText = `
+                position:absolute; border-radius:50%;
+                width:${diameter}px; height:${diameter}px;
+                left:${e.clientX - rect.left - diameter/2}px;
+                top:${e.clientY - rect.top - diameter/2}px;
+                background:rgba(255,255,255,0.35);
+                transform:scale(0); animation:ripple 0.5s ease-out;
+                pointer-events:none;
+            `;
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+            btn.appendChild(circle);
+            setTimeout(() => circle.remove(), 600);
+        });
+    </script>
+    <style>
+        @@keyframes ripple {
+            to { transform: scale(2.5); opacity: 0; }
+        }
+    </style>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

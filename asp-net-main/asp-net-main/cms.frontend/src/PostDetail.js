@@ -50,7 +50,7 @@ function PostDetail() {
   }
 
   return (
-    <div style={{ padding: '40px 24px 80px', maxWidth: '850px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+    <div className="page-transition" style={{ padding: '40px 24px 80px', maxWidth: '850px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
       {/* Navigation */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
@@ -72,10 +72,23 @@ function PostDetail() {
         .back-btn:hover { background: rgba(255,255,255,0.15) !important; border-color: rgba(255,255,255,0.25) !important; transform: translateX(-4px); }
         .hover-link:hover { color: white !important; }
         .article-content p { margin-bottom: 20px; text-align: justify; }
+        @keyframes iosSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(24px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .page-transition {
+          animation: iosSlideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
       `}</style>
 
       {/* Article Panel */}
-      <article style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(30px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '32px', padding: '36px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
+      <article style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(30px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '32px', padding: '36px', boxShadow: '0 20px 50px rgba(0,0,0,0.35)', position: 'relative', overflow: 'hidden' }}>
         {/* Category & Time */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
           <span style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.4)', color: '#c084fc', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700' }}>

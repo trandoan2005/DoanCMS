@@ -33,5 +33,15 @@ namespace CMS.Backend.Controllers
             if (product == null) return NotFound();
             return Ok(product);
         }
+
+        [HttpGet("category/{categoryId}")]
+        public async Task<IActionResult> GetByCategory(int categoryId)
+        {
+            var products = await _context.Products
+                .Include(p => p.CategoryProduct)
+                .Where(p => p.CategoryProductId == categoryId)
+                .ToListAsync();
+            return Ok(products);
+        }
     }
 }

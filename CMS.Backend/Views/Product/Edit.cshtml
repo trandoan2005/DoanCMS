@@ -11,7 +11,7 @@
                 <h5 class="mb-0 fw-semibold"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa thông tin Sản phẩm</h5>
             </div>
             <div class="card-body">
-                <form asp-action="Edit">
+                <form asp-action="Edit" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                     <input type="hidden" asp-for="Id" />
 
@@ -43,10 +43,26 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ImageUrl" class="form-label fw-semibold">Đường dẫn ảnh sản phẩm</label>
-                        <input asp-for="ImageUrl" class="form-control" />
-                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                    <div class="mb-3 card p-3 bg-light border-0">
+                        <label class="form-label fw-bold text-dark"><i class="bi bi-image me-1"></i>Hình ảnh sản phẩm</label>
+                        
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mb-2">
+                                <label class="form-label text-muted small d-block mb-1">Ảnh hiện tại:</label>
+                                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail" style="max-height: 120px; object-fit: cover;" />
+                            </div>
+                        }
+                        
+                        <div class="mb-2">
+                            <label class="form-label text-muted small mb-1">Tải lên ảnh thực tế mới:</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                        </div>
+                        
+                        <div>
+                            <label class="form-label text-muted small mb-1">Hoặc thay đổi liên kết ảnh (URL):</label>
+                            <input name="imageUrl" value="@Model.ImageUrl" class="form-control" />
+                        </div>
                     </div>
 
                     <div class="mb-4">
