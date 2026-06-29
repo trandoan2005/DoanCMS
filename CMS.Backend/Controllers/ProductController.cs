@@ -20,11 +20,28 @@ namespace CMS.Backend.Controllers
         }
 
         // GET: Product
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var products = await _context.Products
+            var query = _context.Products
                 .Include(p => p.CategoryProduct)
+                .OrderBy(p => p.Name);
+
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var products = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems;
+
             return View(products);
         }
 
@@ -56,12 +73,10 @@ namespace CMS.Backend.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Ưu tiên file upload, sau đó mới dùng URL
                 product.ImageUrl = await SaveImageAsync(imageFile, imageUrl);
-
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Đã thêm cá cảnh \"{product.Name}\" thành công! 🐠";
+                TempData["Success"] = $"Thêm sản phẩm \"{product.Name}\" thành công!";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryProductId"] = new SelectList(_context.CategoryProducts, "Id", "Name", product.CategoryProductId);
@@ -88,21 +103,17 @@ namespace CMS.Backend.Controllers
             string? imageUrl)
         {
             if (id != product.Id) return NotFound();
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Nếu có file mới thì dùng, không thì giữ imageUrl cũ (đã bind)
                     if (imageFile != null && imageFile.Length > 0)
                         product.ImageUrl = await SaveImageAsync(imageFile, null);
                     else if (!string.IsNullOrEmpty(imageUrl))
                         product.ImageUrl = imageUrl;
-                    // Nếu cả 2 đều rỗng thì giữ nguyên ImageUrl cũ đã bind
-
                     _context.Update(product);
                     await _context.SaveChangesAsync();
-                    TempData["Success"] = $"Đã cập nhật \"{product.Name}\" thành công! 🐠";
+                    TempData["Success"] = $"Cập nhật sản phẩm \"{product.Name}\" thành công!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,16 +145,14 @@ namespace CMS.Backend.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product != null)
             {
-                // Xóa file ảnh nếu là ảnh upload
                 DeleteLocalImage(product.ImageUrl);
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Đã xóa \"{product.Name}\" thành công!";
+                TempData["Success"] = $"Xóa sản phẩm \"{product.Name}\" thành công!";
             }
             return RedirectToAction(nameof(Index));
         }
 
-        // ── Helper: lưu file ảnh vào wwwroot/uploads ──
         private async Task<string?> SaveImageAsync(IFormFile? imageFile, string? fallbackUrl)
         {
             if (imageFile != null && imageFile.Length > 0)
@@ -155,15 +164,12 @@ namespace CMS.Backend.Controllers
                     TempData["Error"] = "Chỉ chấp nhận file ảnh: jpg, jpeg, png, gif, webp";
                     return fallbackUrl;
                 }
-
                 var fileName = $"{Guid.NewGuid()}{ext}";
-                var folder   = Path.Combine(_env.WebRootPath, "uploads");
+                var folder = Path.Combine(_env.WebRootPath, "uploads");
                 Directory.CreateDirectory(folder);
                 var filePath = Path.Combine(folder, fileName);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await imageFile.CopyToAsync(stream);
-
                 return $"/uploads/{fileName}";
             }
             return string.IsNullOrEmpty(fallbackUrl) ? null : fallbackUrl;

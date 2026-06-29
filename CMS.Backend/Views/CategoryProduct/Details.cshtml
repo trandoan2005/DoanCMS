@@ -21,6 +21,18 @@
                     <dt class="col-sm-3 fw-semibold">Mô tả</dt>
                     <dd class="col-sm-9">@(Model.Description ?? "Không có mô tả")</dd>
 
+                    <dt class="col-sm-3 fw-semibold">Ảnh danh mục</dt>
+                    <dd class="col-sm-9">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail" style="max-height: 120px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Chưa có ảnh</span>
+                        }
+                    </dd>
+
                     <dt class="col-sm-3 fw-semibold">Số sản phẩm</dt>
                     <dd class="col-sm-9">
                         <span class="badge bg-primary fs-6">@(Model.Products?.Count ?? 0) sản phẩm</span>

@@ -20,10 +20,16 @@
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label asp-for="Description" class="form-label fw-semibold">Mô tả</label>
                         <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập mô tả danh mục sản phẩm..."></textarea>
                         <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ImageUrl" class="form-label fw-semibold">Đường dẫn ảnh (ImageUrl)</label>
+                        <input asp-for="ImageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh danh mục (e.g. /images/cat1.jpg)..." />
+                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
                     </div>
 
                     <div class="d-flex gap-2">

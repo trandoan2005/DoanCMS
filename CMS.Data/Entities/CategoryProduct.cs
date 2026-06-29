@@ -1,4 +1,4 @@
-﻿//Sinh viên : Trần Văn Đoàn
+//Sinh viên : Trần Văn Đoàn
 //MSSV:2123110210
 //Lớp:CCQ2311F
 //Ngày tạo: 15/05/2026
@@ -22,6 +22,8 @@ namespace CMS.Data.Entities
         public string Name { get; set; }
 
         public string? Description { get; set; }
+
+        public string? ImageUrl { get; set; }
 
         // Quan hệ: Một danh mục có nhiều sản phẩm
         public virtual ICollection<Product>? Products { get; set; }

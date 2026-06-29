@@ -17,6 +17,7 @@
             <thead class="table-primary">
                 <tr>
                     <th style="width:60px">#</th>
+                    <th style="width:80px">Hình ảnh</th>
                     <th>Tên danh mục</th>
                     <th>Mô tả</th>
                     <th style="width:200px" class="text-center">Thao tác</th>
@@ -26,7 +27,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="4" class="text-center text-muted py-4">
+                        <td colspan="5" class="text-center text-muted py-4">
                             <i class="bi bi-inbox fs-3 d-block mb-2"></i>Chưa có danh mục sản phẩm nào.
                         </td>
                     </tr>
@@ -35,6 +36,16 @@
                 {
                     <tr>
                         <td>@item.Id</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted small" style="font-size: 11px;">Chưa có ảnh</span>
+                            }
+                        </td>
                         <td><strong>@item.Name</strong></td>
                         <td>@item.Description</td>
                         <td class="text-center">

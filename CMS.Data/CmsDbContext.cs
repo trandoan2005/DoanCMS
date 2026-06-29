@@ -18,5 +18,6 @@ namespace CMS.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Banner> Banners { get; set; }
     }
 }

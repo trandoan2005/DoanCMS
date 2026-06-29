@@ -1,0 +1,85 @@
+@model CMS.Backend.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    var changePasswordModel = ViewBag.ChangePasswordModel as CMS.Backend.Models.ChangePasswordViewModel ?? new CMS.Backend.Models.ChangePasswordViewModel();
+}
+
+<div class="container-fluid p-0">
+    <div class="row g-4">
+        <!-- Thông tin tài khoản -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0 text-white fw-bold"><i class="bi bi-person-badge text-warning me-2"></i>THÔNG TIN TÀI KHOẢN</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4 mt-2">
+                        <div class="user-avatar mx-auto mb-3" style="width: 90px; height: 90px; font-size: 36px;">
+                            @(Model.UserName.Length > 0 ? Model.UserName.Substring(0, 1).ToUpper() : "U")
+                        </div>
+                        <h4 class="text-white mb-1 fw-bold">@Model.UserName</h4>
+                        <p class="text-muted mb-0 small text-uppercase letter-spacing-1">
+                            @(Model.Roles != null && Model.Roles.Any() ? string.Join(", ", Model.Roles) : "Người dùng")
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top" style="border-color: var(--glass-border) !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small"><i class="bi bi-envelope me-2"></i>Email</span>
+                            <span class="text-white fw-medium small">@(string.IsNullOrEmpty(Model.Email) ? "Chưa cập nhật" : Model.Email)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small"><i class="bi bi-telephone me-2"></i>Số điện thoại</span>
+                            <span class="text-white fw-medium small">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Chưa cập nhật" : Model.PhoneNumber)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đổi mật khẩu -->
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0 text-white fw-bold"><i class="bi bi-shield-lock text-success me-2"></i>ĐỔI MẬT KHẨU</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert-danger-custom mb-4"></div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="@changePasswordModel.CurrentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                <input asp-for="@changePasswordModel.CurrentPassword" class="form-control" name="CurrentPassword" type="password" placeholder="Nhập mật khẩu hiện tại" />
+                                <span asp-validation-for="@changePasswordModel.CurrentPassword" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="@changePasswordModel.NewPassword" class="form-label">Mật khẩu mới</label>
+                                <input asp-for="@changePasswordModel.NewPassword" class="form-control" name="NewPassword" type="password" placeholder="Nhập mật khẩu mới" />
+                                <span asp-validation-for="@changePasswordModel.NewPassword" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="@changePasswordModel.ConfirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                <input asp-for="@changePasswordModel.ConfirmPassword" class="form-control" name="ConfirmPassword" type="password" placeholder="Nhập lại mật khẩu mới" />
+                                <span asp-validation-for="@changePasswordModel.ConfirmPassword" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-2 pt-3 border-top" style="border-color: var(--glass-border) !important;">
+                            <button type="submit" class="btn btn-success px-4 py-2" style="border-radius: 12px;">
+                                <i class="bi bi-check2-circle me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

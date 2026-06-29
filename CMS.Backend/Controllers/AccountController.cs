@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using CMS.Backend.Models;
 
 namespace CMS.Backend.Controllers
 {
@@ -45,6 +47,85 @@ namespace CMS.Backend.Controllers
             return View();
         }
 
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Không thể tải người dùng với ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var model = new UserProfileViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Roles = roles
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // If model is invalid, we return to the profile view with error messages
+                var user = await _userManager.GetUserAsync(User);
+                var roles = await _userManager.GetRolesAsync(user);
+                var profileModel = new UserProfileViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Roles = roles
+                };
+                ViewBag.ChangePasswordModel = model;
+                ViewBag.ShowChangePasswordForm = true;
+                return View("Profile", profileModel);
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound($"Không thể tải người dùng với ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(currentUser, model.CurrentPassword, model.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                
+                var roles = await _userManager.GetRolesAsync(currentUser);
+                var profileModel = new UserProfileViewModel
+                {
+                    Id = currentUser.Id,
+                    UserName = currentUser.UserName,
+                    Email = currentUser.Email,
+                    PhoneNumber = currentUser.PhoneNumber,
+                    Roles = roles
+                };
+                ViewBag.ChangePasswordModel = model;
+                ViewBag.ShowChangePasswordForm = true;
+                return View("Profile", profileModel);
+            }
+
+            await _signInManager.RefreshSignInAsync(currentUser);
+            TempData["Success"] = "Đổi mật khẩu thành công.";
+            return RedirectToAction("Profile");
+        }
+
         // Tạo tài khoản Admin + debug chi tiết
         public async Task<IActionResult> SeedAdmin()
         {
@@ -65,9 +146,23 @@ namespace CMS.Backend.Controllers
 
             if (user == null)
             {
-                user = new IdentityUser { UserName = "admin", Email = "admin@doancms.com" };
+                user = new IdentityUser { UserName = "admin", Email = "admin@doancms.com", EmailConfirmed = true };
                 var createResult = await _userManager.CreateAsync(user, "Admin@123");
                 log.AppendLine($"Tạo user 'admin': {(createResult.Succeeded ? "THÀNH CÔNG" : string.Join(", ", createResult.Errors.Select(e => e.Description)))}");
+            }
+            else
+            {
+                // Reset password và confirmed email
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+                
+                var hasPassword = await _userManager.HasPasswordAsync(user);
+                if (hasPassword)
+                {
+                    await _userManager.RemovePasswordAsync(user);
+                }
+                var addPassResult = await _userManager.AddPasswordAsync(user, "Admin@123");
+                log.AppendLine($"Reset password cho 'admin' thành 'Admin@123': {(addPassResult.Succeeded ? "THÀNH CÔNG" : "THẤT BẠI: " + string.Join(", ", addPassResult.Errors.Select(e => e.Description)))}");
             }
 
             // Gán role

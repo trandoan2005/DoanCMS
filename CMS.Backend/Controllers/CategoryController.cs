@@ -14,7 +14,7 @@ namespace CMS.Backend.Controllers
         public CategoryController(CmsDbContext context)
         {
             _context = context;
-        }
+        } 
 
         // GET: Category
         public async Task<IActionResult> Index()

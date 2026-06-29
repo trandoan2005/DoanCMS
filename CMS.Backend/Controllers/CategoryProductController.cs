@@ -46,7 +46,7 @@ namespace CMS.Backend.Controllers
         // POST: CategoryProduct/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] CategoryProduct categoryProduct)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,ImageUrl")] CategoryProduct categoryProduct)
         {
             if (ModelState.IsValid)
             {
@@ -57,7 +57,7 @@ namespace CMS.Backend.Controllers
             }
             return View(categoryProduct);
         }
-
+ 
         // GET: CategoryProduct/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -72,7 +72,7 @@ namespace CMS.Backend.Controllers
         // POST: CategoryProduct/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] CategoryProduct categoryProduct)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageUrl")] CategoryProduct categoryProduct)
         {
             if (id != categoryProduct.Id) return NotFound();
 

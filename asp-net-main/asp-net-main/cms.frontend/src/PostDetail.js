@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const API = 'https://localhost:7226';
 
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const activeApi = localStorage.getItem('doan_cms_api_url') || API;
+  return `${activeApi}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,7 +20,8 @@ function PostDetail() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    fetch(`${API}/api/postapi/${id}`)
+    const activeApi = localStorage.getItem('doan_cms_api_url') || API;
+    fetch(`${activeApi}/api/postapi/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Không tìm thấy bài viết');
         return res.json();
@@ -107,7 +117,7 @@ function PostDetail() {
         {/* Banner Image */}
         {post.imageUrl && (
           <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 15px 40px rgba(0,0,0,0.3)', marginBottom: '32px' }}>
-            <img src={post.imageUrl} alt={post.title} style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', display: 'block' }} />
+            <img src={resolveImageUrl(post.imageUrl)} alt={post.title} style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
 

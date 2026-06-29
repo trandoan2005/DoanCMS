@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const API = 'https://localhost:7226';
 
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const activeApi = localStorage.getItem('doan_cms_api_url') || API;
+  return `${activeApi}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 function ProductDetail({ addToCart, cart, products, productCategories }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -52,8 +61,8 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
       }
     }
 
-    // Luôn fetch từ API để cập nhật dữ liệu mới nhất (tồn kho, giá...)
-    fetch(`${API}/api/productapi/${id}`)
+    const activeApi = localStorage.getItem('doan_cms_api_url') || API;
+    fetch(`${activeApi}/api/productapi/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Không tìm thấy sản phẩm');
         return res.json();
@@ -223,7 +232,7 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
           boxShadow: '0 24px 70px rgba(0,0,0,0.4)', height: '450px', display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
-          <img src={product.imageUrl || `https://picsum.photos/600/600?random=${product.id}`} 
+          <img src={resolveImageUrl(product.imageUrl) || `https://picsum.photos/600/600?random=${product.id}`} 
                alt={product.name} 
                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                onError={e => e.target.src = `https://picsum.photos/600/600?random=${product.id}`} />
@@ -266,9 +275,6 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', marginBottom: '24px' }}>
             <span style={{ fontSize: '36px', fontWeight: '900', color: '#ff6b8b', textShadow: '0 0 20px rgba(255,107,139,0.2)' }}>
               {product.price ? product.price.toLocaleString('vi-VN') + ' ₫' : 'Liên hệ'}
-            </span>
-            <span style={{ fontSize: '15px', color: 'rgba(255,255,255,0.3)', textDecoration: 'line-through' }}>
-              {product.price ? (product.price * 1.2).toLocaleString('vi-VN') + ' ₫' : ''}
             </span>
           </div>
 
@@ -408,9 +414,9 @@ function ProductDetail({ addToCart, cart, products, productCategories }) {
               }}>
                 <div className="shine-overlay" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'background 0.1s ease', zIndex: 5 }} />
                 <div style={{ height: '180px', overflow: 'hidden', position: 'relative', zIndex: 6 }}>
-                  <img src={p.imageUrl || `https://picsum.photos/400/300?random=${p.id}`} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.src = `https://picsum.photos/400/300?random=${p.id}`} />
+                  <img src={resolveImageUrl(p.imageUrl) || `https://picsum.photos/400/300?random=${p.id}`} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.src = `https://picsum.photos/400/300?random=${p.id}`} />
                   <div style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(0,0,0,0.5)', padding: '2px 10px', borderRadius: '100px', fontSize: '10px', color: '#00c8ff', border: '1px solid rgba(0,200,255,0.3)', backdropFilter: 'blur(5px)' }}>
-                    {product.categoryProduct?.name || 'Sản phẩm'}
+                    {p.categoryProduct?.name || 'Sản phẩm'}
                   </div>
                 </div>
                 <div style={{ padding: '16px', position: 'relative', zIndex: 6 }}>

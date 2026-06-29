@@ -1,0 +1,289 @@
+/* ========================================================
+   LIQUID GLASS & PROFESSIONAL THEME (iOS 26 - LIGHT/DARK)
+   ======================================================== */
+
+:root {
+  /* Light Theme (Default) */
+  --body-bg: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+             radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+             radial-gradient(at 100% 100%, rgba(243, 232, 255, 0.5) 0px, transparent 50%),
+             #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(0, 0, 0, 0.05);
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+  --card-hover-bg: rgba(255, 255, 255, 0.85);
+  --topbar-bg: rgba(255, 255, 255, 0.7);
+  --nav-bg: rgba(255, 255, 255, 0.4);
+  --dropdown-bg: rgba(255, 255, 255, 0.92);
+  --benefits-bg: rgba(255, 255, 255, 0.8);
+  --footer-bg: #0f172a;
+  --footer-text: #94a3b8;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --body-bg: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.25) 0px, transparent 50%),
+             radial-gradient(at 100% 0%, rgba(17, 24, 39, 0.8) 0px, transparent 50%),
+             radial-gradient(at 100% 100%, rgba(88, 28, 135, 0.2) 0px, transparent 50%),
+             #0b0f19;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --glass-bg: rgba(17, 24, 39, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(17, 24, 39, 0.55);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  --card-hover-bg: rgba(17, 24, 39, 0.7);
+  --topbar-bg: rgba(15, 23, 42, 0.7);
+  --nav-bg: rgba(15, 23, 42, 0.45);
+  --dropdown-bg: rgba(15, 23, 42, 0.92);
+  --benefits-bg: rgba(15, 23, 42, 0.6);
+  --footer-bg: #070a13;
+  --footer-text: #64748b;
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --input-border: rgba(255, 255, 255, 0.08);
+}
+
+/* 1. Base Background with Transitions */
+body {
+  background: var(--body-bg) !important;
+  background-attachment: fixed !important;
+  color: var(--text-main) !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* 2. Liquid Glass Main Header */
+.main-header-glass {
+  background: var(--topbar-bg) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03) !important;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Liquid Glass Navigation Menu */
+.nav-menu-bar {
+  background: var(--nav-bg) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border) !important;
+  position: relative;
+  z-index: 999;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.nav-menu-link {
+  color: var(--text-muted) !important;
+}
+.nav-menu-link:hover {
+  color: #10b981 !important;
+}
+
+/* 3. Liquid Glass Product Cards */
+.product-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--card-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: var(--card-shadow) !important;
+  background: var(--card-hover-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+.product-title {
+  color: var(--text-main) !important;
+}
+
+/* 4. Dropdown Menu for SẢN PHẨM */
+.nav-item-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--dropdown-bg) !important;
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px);
+  min-width: 260px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.5);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border) !important;
+  z-index: 10000;
+  padding: 8px 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+}
+
+.nav-item-dropdown:hover .dropdown-content,
+.nav-item-dropdown:focus-within .dropdown-content {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-item {
+  color: var(--text-main) !important;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #2563eb !important;
+}
+
+/* 5. Benefits Row */
+.benefits-row {
+  background: var(--benefits-bg) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.benefit-icon {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.benefit-text h4 {
+  color: var(--text-main) !important;
+}
+
+.benefit-text p {
+  color: var(--text-muted) !important;
+}
+
+/* 6. About Us Section */
+.about-content p {
+  color: var(--text-muted) !important;
+}
+
+/* 7. Redesigned Section Headers */
+.red-section-header {
+  border-bottom: 2px solid var(--glass-border) !important;
+}
+
+.red-section-title {
+  color: var(--text-main) !important;
+}
+
+/* 8. Shop Category Filter Pills Strip */
+.shop-cat-strip-wrapper {
+  background: var(--nav-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border) !important;
+  border-top: 1px solid var(--glass-border) !important;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.shop-cat-pill {
+  border: 1.5px solid var(--glass-border) !important;
+  background: var(--glass-bg) !important;
+  color: var(--text-muted) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02) !important;
+}
+
+.shop-cat-pill:hover {
+  border-color: #3b82f6 !important;
+  color: #2563eb !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+}
+
+.shop-cat-pill.active {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+/* 9. Footer */
+.footer-dark-theme {
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text) !important;
+  transition: background-color 0.3s ease;
+}
+
+.footer-col h3.footer-logo {
+  color: var(--text-main) !important;
+}
+
+.footer-col h4 {
+  color: var(--text-main) !important;
+}
+
+.footer-col ul li button {
+  color: var(--footer-text) !important;
+}
+
+.footer-col ul li button:hover {
+  color: var(--text-main) !important;
+}
+
+/* inputs override */
+.search-bar-wrapper input {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-main) !important;
+}
+.search-bar-wrapper input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+.logo-main {
+  color: var(--text-main) !important;
+}
+
+.header-cart-btn {
+  color: var(--text-main) !important;
+}
+
+.cart-icon-wrapper {
+  color: var(--text-main) !important;
+}
+
+.cart-text-label {
+  color: var(--text-main) !important;
+}
+
+.section-title {
+  color: var(--text-main) !important;
+}
+.section-title-center {
+  color: var(--text-main) !important;
+}
+.section-subtitle {
+  color: var(--text-muted) !important;
+}
+
+/* Glass card styling */
+.glass-card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}

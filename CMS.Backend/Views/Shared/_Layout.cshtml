@@ -6,45 +6,94 @@
     <title>@ViewData["Title"] - DoanCMS Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <script>
+        (function() {
+            var theme = localStorage.getItem('admin_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <style>
+        @@font-face {
+            font-family: 'OPPOSans';
+            src: url('/fonts/OPPOSans-R.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @@font-face {
+            font-family: 'OPPOSans';
+            src: url('/fonts/OPPOSans-B.ttf') format('truetype');
+            font-weight: 700 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
         :root {
-            --bg-dark: #070814;
-            --glass-bg: rgba(22, 25, 48, 0.45);
-            --glass-bg-hover: rgba(32, 36, 68, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.07);
-            --glass-border-focus: rgba(99, 102, 241, 0.4);
-            --accent-color: #6366f1;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --accent-glow: rgba(99, 102, 241, 0.3);
-            --text-main: #e2e8f0;
-            --text-muted: rgba(255, 255, 255, 0.45);
+            /* General Variables */
+            --accent-color: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #10b981 50%, #f59e0b 100%);
+            --accent-glow: rgba(59, 130, 246, 0.3);
+
+            /* Dark Theme (Default) */
+            --body-bg: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.25) 0px, transparent 50%),
+                       radial-gradient(at 100% 0%, rgba(17, 24, 39, 0.8) 0px, transparent 50%),
+                       radial-gradient(at 100% 100%, rgba(88, 28, 135, 0.2) 0px, transparent 50%),
+                       #0b0f19;
+            --glass-bg: rgba(17, 24, 39, 0.45);
+            --glass-bg-hover: rgba(17, 24, 39, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-focus: rgba(59, 130, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-bg: rgba(15, 23, 42, 0.4);
+            --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --input-border: rgba(255, 255, 255, 0.08);
+            --option-bg: #1e293b;
+        }
+
+        [data-theme="light"] {
+            /* Light Theme */
+            --body-bg: radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.3) 0px, transparent 50%),
+                       radial-gradient(at 100% 0%, rgba(209, 250, 229, 0.3) 0px, transparent 50%),
+                       radial-gradient(at 100% 100%, rgba(243, 232, 255, 0.3) 0px, transparent 50%),
+                       #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-hover: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-border-focus: rgba(59, 130, 246, 0.4);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --sidebar-bg: rgba(255, 255, 255, 0.7);
+            --card-shadow: 0 15px 35px rgba(31, 38, 135, 0.08);
+            --input-bg: rgba(0, 0, 0, 0.02);
+            --input-border: rgba(0, 0, 0, 0.08);
+            --option-bg: #ffffff;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'OPPOSans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         body {
-            background: var(--bg-dark);
+            background: var(--body-bg);
+            background-attachment: fixed;
             color: var(--text-main);
             display: flex;
             min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 45%), 
-                radial-gradient(circle at 95% 85%, rgba(139, 92, 246, 0.04) 0%, transparent 45%);
-            background-attachment: fixed;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* SIDEBAR */
         .sidebar {
             width: 260px;
             min-height: 100vh;
-            background: rgba(18, 20, 39, 0.55);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
             border-right: 1px solid var(--glass-border);
             display: flex;
             flex-direction: column;
@@ -53,10 +102,11 @@
             left: 0;
             bottom: 0;
             z-index: 100;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .sidebar-brand {
-            padding: 24px 20px;
+            padding: 16px 10px;
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
@@ -157,7 +207,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #ec4899);
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -165,7 +215,7 @@
             font-weight: 700;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
         }
 
         .user-name {
@@ -188,9 +238,9 @@
         }
 
         .topbar {
-            background: rgba(11, 13, 24, 0.6);
-            backdrop-filter: blur(30px) saturate(190%);
-            -webkit-backdrop-filter: blur(30px) saturate(190%);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
             border-bottom: 1px solid var(--glass-border);
             padding: 16px 32px;
             display: flex;
@@ -199,12 +249,13 @@
             position: sticky;
             top: 0;
             z-index: 50;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .page-title {
             font-size: 20px;
             font-weight: 800;
-            color: white;
+            color: var(--text-main);
             letter-spacing: -0.5px;
         }
 
@@ -242,6 +293,24 @@
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
         }
 
+        .btn-theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: scale(1.05);
+        }
+
         .content-area {
             padding: 32px;
             flex: 1;
@@ -266,15 +335,15 @@
             -webkit-backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--glass-border) !important;
             border-radius: 24px !important;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+            box-shadow: var(--card-shadow) !important;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
         }
 
         .card:hover {
             transform: translateY(-4px);
-            border-color: rgba(99, 102, 241, 0.2) !important;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4) !important;
+            border-color: var(--glass-border-focus) !important;
+            box-shadow: var(--card-shadow) !important;
         }
 
         .card-header {
@@ -299,12 +368,12 @@
         }
 
         .table tbody tr {
-            background: rgba(255, 255, 255, 0.015);
+            background: rgba(255, 255, 255, 0.02);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .table tbody tr:hover td {
-            background-color: rgba(255, 255, 255, 0.04) !important;
+            background-color: rgba(255, 255, 255, 0.06) !important;
             color: white !important;
         }
 
@@ -320,7 +389,7 @@
         }
 
         .table thead th {
-            background: rgba(255, 255, 255, 0.03) !important;
+            background: rgba(255, 255, 255, 0.04) !important;
             color: var(--text-muted) !important;
             font-size: 11px;
             font-weight: 700;
@@ -349,7 +418,7 @@
         .stat-card:hover {
             background: var(--glass-bg-hover);
             transform: translateY(-4px) scale(1.02);
-            border-color: rgba(99, 102, 241, 0.25);
+            border-color: rgba(245, 158, 11, 0.3);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
@@ -425,37 +494,38 @@
 
         /* FORMS */
         .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid var(--glass-border) !important;
+            background: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 14px !important;
             padding: 12px 16px !important;
-            color: white !important;
+            color: var(--text-main) !important;
             font-size: 14.5px !important;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .form-control:focus, .form-select:focus {
-            background: rgba(255, 255, 255, 0.06) !important;
+            background: var(--glass-bg-hover) !important;
             border-color: var(--glass-border-focus) !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.25) !important;
+            color: var(--text-muted) !important;
+            opacity: 0.5;
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.65);
+            color: var(--text-muted);
             font-size: 13.5px;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
         .form-select option {
-            background: #15172d;
-            color: white;
+            background: var(--option-bg);
+            color: var(--text-main);
         }
 
         /* ALERTS */
@@ -487,12 +557,72 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar scrollbar-hide">
-        <div class="sidebar-brand">
-            <div class="brand-icon">D</div>
-            <div>
-                <div class="brand-text">DoanCMS</div>
-                <div class="brand-sub">Admin Panel</div>
-            </div>
+        <div class="sidebar-brand" style="border-bottom: 1px solid var(--glass-border); padding: 16px 10px;">
+            <svg viewBox="0 0 220 60" style="width: 100%; height: 50px;" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="fishGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color: #fbbf24" />
+                        <stop offset="50%" style="stop-color: #ef4444" />
+                        <stop offset="100%" style="stop-color: #ec4899" />
+                    </linearGradient>
+                    <linearGradient id="tailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color: #ef4444" />
+                        <stop offset="100%" style="stop-color: #8b5cf6" />
+                    </linearGradient>
+                    <linearGradient id="finGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color: #f59e0b" />
+                        <stop offset="100%" style="stop-color: #ef4444" />
+                    </linearGradient>
+                    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color: #ffffff" />
+                        <stop offset="40%" style="stop-color: #ffd269" />
+                        <stop offset="100%" style="stop-color: #ff8838" />
+                    </linearGradient>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
+                
+                <g transform="translate(32, 30)">
+                    <circle cx="0" cy="0" r="23" fill="none" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1" stroke-dasharray="3 3">
+                        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="0" cy="0" r="19" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+                    
+                    <path d="M6,-3 C12,-15 25,-18 22,-6 C20,3 10,2 6,-3 Z" fill="url(#tailGrad)" opacity="0.8">
+                        <animate attributeName="d" values="M6,-3 C12,-15 25,-18 22,-6 C20,3 10,2 6,-3 Z; M6,-3 C14,-13 27,-15 22,-6 C18,0 11,1 6,-3 Z; M6,-3 C12,-15 25,-18 22,-6 C20,3 10,2 6,-3 Z" dur="3s" repeatCount="indefinite" />
+                    </path>
+                    <path d="M8,-5 C14,-10 20,-12 18,-6 C16,0 10,-2 8,-5 Z" fill="url(#finGrad)" opacity="0.9" />
+                    
+                    <path d="M-12,8 C-18,0 -12,-8 -3,-10 C4,-11 10,-4 6,3 C3,8 -4,14 -12,8 Z" fill="url(#fishGrad)" />
+                    
+                    <path d="M-6,-11 C-2,-18 2,-20 0,-15 C-2,-12 -4,-11 -6,-11 Z" fill="url(#finGrad)" />
+                    <path d="M-8,10 C-10,18 -16,16 -12,12 C-9,9 -7,9 -8,10 Z" fill="url(#finGrad)" />
+                    
+                    <circle cx="-10" cy="2" r="1.8" fill="white" />
+                    <circle cx="-10.5" cy="1.8" r="0.9" fill="#1a0f2e" />
+                    <circle cx="-11" cy="1.5" r="0.4" fill="white" />
+                    
+                    <path d="M-7,4 C-5,2 -5,-1 -7,-3" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1" />
+                    
+                    <circle cx="-15" cy="-8" r="1.5" fill="rgba(255, 255, 255, 0.4)">
+                        <animate attributeName="cy" values="-8;-20;-8" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="-18" cy="-3" r="1" fill="rgba(255, 255, 255, 0.3)">
+                        <animate attributeName="cy" values="-3;-15;-3" dur="2.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+                
+                <text x="82" y="27" font-family="'OPPOSans', -apple-system, sans-serif" font-size="24" font-weight="900" fill="url(#textGrad)" letter-spacing="1.5" filter="url(#glow)">
+                    DoanCMS
+                </text>
+                <text x="82" y="44" font-family="'OPPOSans', -apple-system, sans-serif" font-size="9" font-weight="800" fill="#ffd269" letter-spacing="4" opacity="0.85">
+                    AQUA & PET
+                </text>
+            </svg>
         </div>
 
         <div class="sidebar-section">Tổng quan</div>
@@ -508,6 +638,12 @@
             <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")"
                asp-controller="Category" asp-action="Index">
                 <i class="bi bi-tags-fill"></i> Danh mục
+            </a>
+        </div>
+        <div class="nav-item-custom">
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "Banners" ? "active" : "")"
+               asp-controller="Banners" asp-action="Index">
+                <i class="bi bi-images"></i> Quản lý Banner
             </a>
         </div>
         <div class="nav-item-custom">
@@ -545,20 +681,46 @@
 
         <div class="sidebar-section">Hệ thống</div>
         <div class="nav-item-custom">
-            <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")"
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")"
+               asp-controller="Account" asp-action="Profile">
+                <i class="bi bi-person-fill-gear"></i> Hồ sơ cá nhân
+            </a>
+        </div>
+        <div class="nav-item-custom">
+            <a class="nav-link-custom @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "Login" ? "active" : "")"
                asp-controller="Account" asp-action="Login">
                 <i class="bi bi-shield-lock-fill"></i> Bảo mật
             </a>
         </div>
 
         <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar">TD</div>
-                <div>
-                    <div class="user-name">Trần Văn Đoàn</div>
-                    <div class="user-role">CCQ2311F · 2123110210</div>
+            <a asp-controller="Account" asp-action="Profile" style="text-decoration: none; color: inherit; display: block;">
+                <div class="user-card" style="cursor: pointer; transition: background 0.2s;">
+                    <div class="user-avatar">
+                        @if (User.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+                        {
+                            @User.Identity.Name.Substring(0, 1).ToUpper()
+                        }
+                        else
+                        {
+                            @:TD
+                        }
+                    </div>
+                    <div>
+                        <div class="user-name">
+                            @if (User.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+                            {
+                                @User.Identity.Name
+                            }
+                            else
+                            {
+                                @:Trần Văn Đoàn
+                            }
+                        </div>
+                        <div class="user-role">CCQ2311F · 2123110210</div>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -572,10 +734,13 @@
             <div class="topbar-actions">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <span class="text-white-50 me-2 small fw-semibold">
+                    <a asp-controller="Account" asp-action="Profile" class="me-2 small fw-semibold text-decoration-none" style="transition: color 0.2s; color: var(--text-muted);">
                         <i class="bi bi-person-circle me-1 text-success"></i>Xin chào, @User.Identity.Name
-                    </span>
+                    </a>
                 }
+                <button id="theme-toggle" class="btn-theme-toggle" title="Chuyển chế độ Sáng/Tối">
+                    <i id="theme-icon" class="bi bi-moon-fill"></i>
+                </button>
                 <a href="http://localhost:3000" target="_blank" class="btn-logout" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border-color:rgba(99,102,241,0.2);">
                     <i class="bi bi-box-arrow-up-right"></i> Xem Frontend
                 </a>
@@ -603,5 +768,31 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var toggleBtn = document.getElementById("theme-toggle");
+            var themeIcon = document.getElementById("theme-icon");
+            
+            function updateIcon(theme) {
+                if (theme === 'light') {
+                    themeIcon.className = 'bi bi-sun-fill';
+                } else {
+                    themeIcon.className = 'bi bi-moon-fill';
+                }
+            }
+
+            var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            updateIcon(currentTheme);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener("click", function() {
+                    var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('admin_theme', theme);
+                    updateIcon(theme);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

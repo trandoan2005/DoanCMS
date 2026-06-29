@@ -20,9 +20,27 @@ namespace CMS.Backend.Controllers
         }
 
         // GET: Post
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var posts = await _context.Posts.Include(p => p.Category).ToListAsync();
+            var query = _context.Posts.Include(p => p.Category).OrderByDescending(p => p.CreatedDate);
+
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Đảm bảo page hợp lệ
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var posts = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems;
+
             return View(posts);
         }
 
@@ -58,7 +76,7 @@ namespace CMS.Backend.Controllers
                 post.CreatedDate = DateTime.Now;
                 _context.Add(post);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Thêm bài viết thành công! 🐟";
+                TempData["Success"] = "Thêm bài viết thành công!";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", post.CategoryId);
@@ -85,7 +103,6 @@ namespace CMS.Backend.Controllers
             string? imageUrl)
         {
             if (id != post.Id) return NotFound();
-
             if (ModelState.IsValid)
             {
                 try
@@ -94,10 +111,9 @@ namespace CMS.Backend.Controllers
                         post.ImageUrl = await SaveImageAsync(imageFile, null);
                     else if (!string.IsNullOrEmpty(imageUrl))
                         post.ImageUrl = imageUrl;
-
                     _context.Update(post);
                     await _context.SaveChangesAsync();
-                    TempData["Success"] = "Cập nhật bài viết thành công! 🐟";
+                    TempData["Success"] = "Cập nhật bài viết thành công!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -144,15 +160,12 @@ namespace CMS.Backend.Controllers
                 var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
                 var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 if (!allowed.Contains(ext)) return fallbackUrl;
-
                 var fileName = $"{Guid.NewGuid()}{ext}";
-                var folder   = Path.Combine(_env.WebRootPath, "uploads");
+                var folder = Path.Combine(_env.WebRootPath, "uploads");
                 Directory.CreateDirectory(folder);
                 var filePath = Path.Combine(folder, fileName);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await imageFile.CopyToAsync(stream);
-
                 return $"/uploads/{fileName}";
             }
             return string.IsNullOrEmpty(fallbackUrl) ? null : fallbackUrl;

@@ -45,7 +45,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")   // Địa chỉ React dev server
+        policy.AllowAnyOrigin()                      // Cho phép mọi origin
               .AllowAnyHeader()                        // Cho phép mọi header
               .AllowAnyMethod();                       // Cho phép GET, POST, PUT, DELETE
     });
